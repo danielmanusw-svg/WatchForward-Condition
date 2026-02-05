@@ -17,6 +17,7 @@ interface HeaderProps {
   isSupplementsPage?: boolean;
   isAnimationFinished?: boolean;
   isScrolled?: boolean;
+  isArticleDetailPage?: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -34,10 +35,11 @@ export const Header: React.FC<HeaderProps> = ({
   basketCount = 0,
   isSupplementsPage,
   isAnimationFinished,
-  isScrolled
+  isScrolled,
+  isArticleDetailPage
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const forcesDarkModeColors = isSupplementsPage && !isAnimationFinished;
+  const forcesDarkModeColors = (isSupplementsPage || isArticleDetailPage) && !isAnimationFinished;
 
   const navItems = [
     { name: 'Home', href: '#' },
@@ -50,7 +52,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-500">
-      <nav className={`max-w-7xl mx-auto flex items-center justify-between px-8 py-4 mt-4 transition-all duration-700 rounded-2xl ${(isSupplementsPage && isAnimationFinished) || (!isSupplementsPage && isScrolled)
+      <nav className={`max-w-7xl mx-auto flex items-center justify-between px-6 py-4 mt-4 transition-all duration-700 rounded-2xl ${(isSupplementsPage && isAnimationFinished) || (!isSupplementsPage && isScrolled) || isArticleDetailPage
         ? 'bg-white/5 backdrop-blur-2xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.3)]'
         : 'bg-transparent border-transparent'
         }`}>

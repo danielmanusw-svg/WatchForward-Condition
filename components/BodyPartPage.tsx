@@ -14,7 +14,7 @@ export const BodyPartPage: React.FC<BodyPartPageProps> = ({ onBackClick }) => {
     ];
 
     return (
-        <div className="w-full pl-6 pt-24 ml-[10%] animate-fade-in relative min-h-screen">
+        <div className="w-full max-w-7xl mx-auto pt-24 px-6 animate-fade-in relative min-h-screen">
             {/* Top Navigation Row - Positioned High and Left */}
             <div className="flex flex-row items-center gap-8 mb-16">
                 {/* Back Button */}

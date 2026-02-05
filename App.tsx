@@ -11,6 +11,8 @@ import { ContactPage } from './components/ContactPage';
 import { ShopPage } from './components/ShopPage';
 import { ProductSalesPage } from './components/ProductSalesPage';
 import { CheckoutPage } from './components/CheckoutPage';
+import { ArticleDetailPage } from './components/ArticleDetailPage';
+import { Article } from './components/ArticlesPage';
 
 export interface BasketItem {
   id: string;
@@ -23,7 +25,8 @@ export interface BasketItem {
 const App: React.FC = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isLogoHovered, setIsLogoHovered] = useState(false);
-  const [currentPage, setCurrentPage] = useState<'home' | 'supplements_list' | 'performance_menu' | 'articles' | 'body_part' | 'contact' | 'shop' | 'product_sales' | 'checkout'>('home');
+  const [currentPage, setCurrentPage] = useState<'home' | 'supplements_list' | 'performance_menu' | 'articles' | 'article_detail' | 'body_part' | 'contact' | 'shop' | 'product_sales' | 'checkout'>('home');
+  const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
   const [selectedProductId, setSelectedProductId] = useState<'collagen' | 'vitaminc' | null>(null);
   const [basket, setBasket] = useState<BasketItem[]>([]);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -43,8 +46,12 @@ const App: React.FC = () => {
       // General scroll detection
       setIsScrolled(window.scrollY > 20);
 
-      // Threshold: Scroll past the 600vh track (~5.5vh to be safe)
-      const threshold = window.innerHeight * 5.5;
+      // Threshold: Scroll past the hero
+      // Supplements track (~5.5vh) or Article Hero (~0.7vh/70vh)
+      const threshold = currentPage === 'supplements_list'
+        ? window.innerHeight * 5.5
+        : window.innerHeight * 0.7;
+
       if (window.scrollY > threshold) {
         setIsAnimationFinished(true);
       } else {
@@ -58,7 +65,7 @@ const App: React.FC = () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('scroll', handleScroll);
     };
-  }, []);
+  }, [currentPage]);
 
   useEffect(() => {
     if (isDarkMode) {
@@ -145,6 +152,7 @@ const App: React.FC = () => {
         onContactClick={() => setCurrentPage('contact')}
         onBasketClick={() => setIsBasketOpen(true)}
         isSupplementsPage={currentPage === 'supplements_list'}
+        isArticleDetailPage={currentPage === 'article_detail'}
         isAnimationFinished={isAnimationFinished}
         isScrolled={isScrolled}
         basketCount={basket.reduce((acc, item) => acc + item.quantity, 0)}
@@ -162,12 +170,12 @@ const App: React.FC = () => {
         }}
       />
 
-      <main className={`flex-grow flex flex-col items-center transition-all duration-700 ${currentPage === 'supplements_list'
-        ? 'pt-0 px-0 space-y-0 translate-y-0 w-full justify-start'
-        : 'pt-24 px-6 space-y-16 -translate-y-16 justify-center'
+      <main className={`flex-grow flex flex-col items-center w-full ${currentPage === 'supplements_list' || currentPage === 'article_detail'
+        ? 'pt-0 px-0'
+        : 'pt-24 px-0'
         }`}>
         {currentPage === 'home' ? (
-          <>
+          <div className="flex flex-col items-center justify-center space-y-16 py-12 flex-grow">
             <h1 className="text-4xl md:text-6xl font-heading font-bold text-center tracking-tight max-w-5xl leading-tight animate-fade-in">
               <span className="text-black dark:text-white">Defining the Ambiguity of </span>
               <br className="block md:hidden" />
@@ -202,11 +210,19 @@ const App: React.FC = () => {
                 </span>
               </button>
             </div>
-          </>
+          </div>
         ) : currentPage === 'performance_menu' ? (
           <PerformanceMenu onButtonClick={() => setCurrentPage('body_part')} />
         ) : currentPage === 'articles' ? (
-          <ArticlesPage />
+          <ArticlesPage onArticleClick={(article) => {
+            setSelectedArticle(article);
+            setCurrentPage('article_detail');
+          }} />
+        ) : currentPage === 'article_detail' && selectedArticle ? (
+          <ArticleDetailPage
+            article={selectedArticle}
+            onBack={() => setCurrentPage('articles')}
+          />
         ) : currentPage === 'body_part' ? (
           <BodyPartPage onBackClick={() => setCurrentPage('performance_menu')} />
         ) : currentPage === 'contact' ? (
